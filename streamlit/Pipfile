@@ -1,0 +1,41 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+# Web Framework
+fastapi = "*"
+uvicorn = "*"
+streamlit = "*"
+
+# Database
+sqlalchemy = "*"
+aiosql = "*"
+
+# Security & Authentication
+passlib = {extras = ["bcrypt"], version = "*"}
+python-jose = {extras = ["cryptography"], version = "*"}
+
+# File & Data Processing
+pandas = "*"
+openpyxl = "*"
+xlsxwriter = "*"
+requests = "*"
+aiohttp = "*"
+aiofiles = "*"
+python-multipart = "*"
+
+# Configuration
+python-dotenv = "*"
+configparser = "*"
+
+[dev-packages]
+pytest = "*"
+pytest-asyncio = "*"
+black = "*"
+flake8 = "*"
+mypy = "*"
+
+[requires]
+python_version = "3.12"
