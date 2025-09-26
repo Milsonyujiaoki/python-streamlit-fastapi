@@ -1,6 +1,6 @@
-# 🏢 Sistema Corporativo Modular
+# 🏢 Sistema Corporativo Integrado
 
-Sistema Streamlit modular e escalável para edição de dados corporativos e outras funcionalidades empresariais.
+Sistema Streamlit modular e escalável para edição de dados corporativos com funcionalidades avançadas de manipulação de Excel, análise de dados e automação empresarial.
 
 ## 📁 Estrutura do Projeto
 
@@ -14,6 +14,7 @@ Sistema Streamlit modular e escalável para edição de dados corporativos e out
 │   ├── __init__.py
 │   ├── societary.py            # Editor de atos societários  
 │   ├── lyrics.py               # Pesquisador de letras
+│   ├── excel_editor.py         # Editor completo de Excel
 │   └── example.py              # Exemplo de novo módulo
 └── 📄 README.md                # Este arquivo
 ```
@@ -35,17 +36,102 @@ Sistema Streamlit modular e escalável para edição de dados corporativos e out
 - Componentes de UI padronizados
 - Templates para desenvolvimento rápido
 
-## 🛠️ Como Usar
+## 🛠️ Instalação e Uso
+
+### Pré-requisitos
+- Python 3.12+
+- pipenv ou pip
+
+### Instalação
+```bash
+# Clonar o repositório
+git clone <repository-url>
+cd python-streamlit-fastapi
+
+# Instalar dependências com pipenv (recomendado)
+pipenv install
+
+# Ou com pip
+pip install -r requirements.txt
+```
 
 ### Executar a Aplicação
 ```bash
+# Com pipenv
+pipenv run streamlit run app.py
+
+# Ou diretamente
 streamlit run app.py
 ```
 
+### Acesso
+Abra seu navegador em: `http://localhost:8501`
+
+## 🎯 Casos de Uso Práticos
+
+### Para Empresas
+- **📋 Gestão de Dados Corporativos**: Edição de planilhas empresariais com validação
+- **🔄 Integração de Sistemas**: Combinação de dados de diferentes fontes
+- **📊 Análise Rápida**: Insights instantâneos sem necessidade de ferramentas complexas
+- **📑 Relatórios Automatizados**: Geração de relatórios a partir de múltiplas fontes
+
+### Para Analistas
+- **🔍 Exploração de Dados**: Interface intuitiva para análise exploratória
+- **🧮 Cálculos Avançados**: Operações matemáticas entre colunas e tabelas
+- **📈 Estatísticas Descritivas**: Análise automática com métricas relevantes
+- **💱 Conversão de Dados**: Tabelas DE/PARA para padronização
+
+### Para Desenvolvedores
+- **🚀 Prototipagem Rápida**: Desenvolvimento ágil de módulos
+- **🔧 Reutilização**: Componentes prontos para uso
+- **🏗️ Arquitetura Escalável**: Base sólida para expansão
+- **📦 Modularidade**: Fácil manutenção e extensão
+
+## 📊 Funcionalidades do Editor de Excel
+
+### 🔧 **Upload e Gerenciamento**
+- **Upload Múltiplo**: Carregue vários arquivos Excel/CSV simultaneamente
+- **Múltiplas Planilhas**: Navegue entre diferentes abas do mesmo arquivo
+- **Visualização**: Preview dos dados com informações detalhadas
+- **Renomeação**: Defina nomes personalizados para suas tabelas
+
+### ✏️ **Edição Avançada**
+- **Editor Interativo**: Modifique dados diretamente na interface
+- **Operações de Coluna**: Adicione, remova e renomeie colunas
+- **Restauração**: Volte aos dados originais a qualquer momento
+- **Validação**: Verificação automática de tipos e formato
+
+### 🔗 **Operações de Dados**
+- **JOIN/MERGE**: Combine tabelas com diferentes tipos de junção
+- **PROCV/Lookup**: Busque valores entre tabelas (equivalente ao VLOOKUP)
+- **DE/PARA**: Substitua valores usando tabelas de conversão
+- **Matemática**: Soma, subtração, multiplicação, divisão entre colunas
+- **Estatísticas**: Análise descritiva completa dos dados
+
+### 📈 **Análise e Visualização**
+- **Estatísticas Gerais**: Contagem de linhas, colunas, valores nulos
+- **Análise por Colunas**: Insights específicos por tipo de dado
+- **Valores Únicos**: Identificação de padrões nos dados
+- **Distribuição**: Visualização da estrutura dos dados
+
+### 💾 **Export e Download**
+- **Excel**: Download no formato .xlsx preservando formatação
+- **CSV**: Export para análise em outras ferramentas
+- **Múltiplas Tabelas**: Download individual ou em lote
+
 ### Módulos Disponíveis
-1. **🏢 Editor de Atos Societários** - Edição de dados corporativos
-2. **🎵 Pesquisador de Letras** - Busca letras de música
-3. **🚀 Módulo de Exemplo** - Template para novos módulos
+
+1. **🏢 Editor de Atos Societários** - Edição e gerenciamento de dados corporativos
+2. **🎵 Pesquisador de Letras** - Busca letras de música via API
+3. **� Editor de Excel** - Editor completo com funcionalidades avançadas:
+   - Upload múltiplo de arquivos (Excel/CSV)
+   - Seleção de planilhas individuais
+   - Editor de dados com interface intuitiva
+   - Operações avançadas (JOIN, MERGE, PROCV)
+   - Tabelas DE/PARA e operações matemáticas
+   - Análise estatística e visualização
+   - Download em múltiplos formatos
+4. **�🚀 Módulo de Exemplo** - Template para desenvolvimento de novos módulos
 
 ## 🔧 Arquitetura
 
@@ -192,16 +278,41 @@ arquivo = UIComponents.file_uploader(
 - **Funcionalidades Integradas**: Tudo em um lugar
 - **Experiência Fluída**: Componentes padronizados
 
-## 🔮 Próximas Melhorias
+## � Dependências
 
-- [ ] Sistema de plugins dinâmicos
-- [ ] Configurações por usuário
-- [ ] Tema customizável
-- [ ] Cache inteligente
-- [ ] Logs centralizados
-- [ ] Autenticação/autorização
-- [ ] API REST opcional
-- [ ] Testes automatizados
+### Principais
+- **streamlit** - Framework web interativo
+- **pandas** - Manipulação e análise de dados
+- **openpyxl** - Leitura/escrita de arquivos Excel
+- **xlsxwriter** - Geração otimizada de arquivos Excel
+- **requests** - Requisições HTTP para APIs
+- **fastapi** - API REST (opcional)
+
+### Desenvolvimento
+- **pytest** - Framework de testes
+- **black** - Formatador de código
+- **flake8** - Linter de código
+- **mypy** - Verificador de tipos
+
+## �🔮 Próximas Melhorias
+
+### Em Desenvolvimento
+- [x] **Editor completo de Excel** - Funcionalidades avançadas
+- [x] **Operações de dados** - JOIN, MERGE, PROCV
+- [x] **Múltiplas planilhas** - Navegação entre abas
+- [x] **Análise estatística** - Insights automáticos
+
+### Planejado
+- [ ] **Dashboard visual** - Gráficos interativos
+- [ ] **Módulo de relatórios** - Templates personalizáveis  
+- [ ] **Sistema de plugins** - Carregamento dinâmico
+- [ ] **Configurações por usuário** - Preferências salvas
+- [ ] **Tema customizável** - Interface personalizável
+- [ ] **Cache inteligente** - Performance otimizada
+- [ ] **Logs centralizados** - Monitoramento completo
+- [ ] **Autenticação/autorização** - Controle de acesso
+- [ ] **API REST integrada** - Automação externa
+- [ ] **Testes automatizados** - Qualidade garantida
 
 ## 🤝 Contribuindo
 
@@ -212,4 +323,15 @@ arquivo = UIComponents.file_uploader(
 
 ---
 
-**Desenvolvido com ❤️ usando Streamlit e Python**
+## 💻 Tecnologias Utilizadas
+
+- **Python 3.12+** - Linguagem principal
+- **Streamlit** - Framework web interativo
+- **Pandas** - Manipulação de dados
+- **OpenPyXL/XlsxWriter** - Processamento Excel
+- **FastAPI** - API REST (opcional)
+- **Pipenv** - Gerenciamento de dependências
+
+---
+
+*Desenvolvido com ❤️ para facilitar o trabalho com dados corporativos*
