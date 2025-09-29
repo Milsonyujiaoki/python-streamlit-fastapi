@@ -2,6 +2,8 @@ from cProfile import label
 from calendar import c
 from email.policy import default
 from logging import PlaceHolder
+from tkinter import Place
+from altair import value
 from narwhals import col
 import numpy as np
 from numpy.random import default_rng as rng
@@ -12,6 +14,7 @@ import pandas as pd
 import os
 from PIL import Image, ImageDraw
 import io
+import json
 import time
 
 def create_test_image():
@@ -154,7 +157,12 @@ def render_opcao1():
     st.file_uploader("File Uploader de Teste")
     st.color_picker("Color Picker de Teste", "#00f900")
     st.metric("Metric de Teste", 42, -3)
-    st.progress(70)
+    
+    # Progress Bar interativo com slider
+    st.write("Progress Bar interativo:")
+    progress_value = st.slider("Ajuste o progresso:", 0, 100, 70, key="progress_slider")
+    st.progress(progress_value / 100.0)
+    st.caption(f"Progresso atual: {progress_value}%")
 
     st.divider()
 
@@ -640,12 +648,28 @@ def render_opcao2():
         
     st.divider()
     
-    # Exemplo de barra de progresso
+    # Exemplo de barra de progresso controlada
     st.write("Exemplo de barra de progresso:")
-    progress_bar = st.progress(0)
-    for i in range(101):
-        progress_bar.progress(i)
-        time.sleep(0.1)
+    
+    # Botão para iniciar o progress bar
+    if st.button("🚀 Iniciar Progress Bar", key="start_progress_1"):
+        progress_container = st.empty()
+        status_text = st.empty()
+        
+        # Criar progress bar
+        progress_bar = progress_container.progress(0)
+        
+        for i in range(101):
+            # Atualizar o progress bar
+            progress_bar.progress(i)
+            # Atualizar texto de status
+            status_text.text(f"Processando... {i}%")
+            time.sleep(0.05)  # Reduzir tempo para ser mais rápido
+            
+        # Finalizar
+        status_text.success("✅ Progress Bar concluído com sucesso!")
+        time.sleep(1)
+        progress_container.empty()  # Limpar o progress bar após conclusão
         
     st.divider()
     
@@ -653,6 +677,64 @@ def render_opcao2():
     st.write("Exemplo de slider interativo:")
     slider_value = st.slider("Selecione um valor:", 0, 100, 50)
     st.write(f"Valor selecionado: {slider_value}")
+    
+    st.divider()
+    
+    # Seção avançada de Progress Bars
+    st.write("### 🎯 Progress Bars Avançados")
+    
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        st.write("**Progress Bar com Simulação de Download**")
+        if st.button("📥 Simular Download", key="simulate_download"):
+            files = ["arquivo1.pdf", "arquivo2.xlsx", "arquivo3.png", "arquivo4.docx", "arquivo5.zip"]
+            download_container = st.empty()
+            
+            for idx, file in enumerate(files):
+                with download_container.container():
+                    st.write(f"Baixando: {file}")
+                    progress = st.progress(0)
+                    
+                    # Simular download do arquivo
+                    for percent in range(101):
+                        progress.progress(percent / 100)
+                        time.sleep(0.02)
+                    
+                    st.success(f"✅ {file} baixado!")
+                    time.sleep(0.5)
+            
+            download_container.success("🎉 Todos os arquivos baixados com sucesso!")
+    
+    with col2:
+        st.write("**Progress Bar Multi-etapa**")
+        if st.button("🔄 Processo Multi-etapa", key="multi_step"):
+            steps = [
+                ("🔍 Verificando dados", 20),
+                ("📊 Processando informações", 40), 
+                ("💾 Salvando resultados", 30),
+                ("✅ Finalizando processo", 10)
+            ]
+            
+            multi_container = st.empty()
+            total_progress = st.progress(0)
+            current_progress = 0
+            
+            for step_name, step_duration in steps:
+                with multi_container.container():
+                    st.info(step_name)
+                    step_progress = st.progress(0)
+                    
+                    for i in range(step_duration):
+                        step_progress.progress((i + 1) / step_duration)
+                        current_progress += 1
+                        total_progress.progress(current_progress / 100)
+                        time.sleep(0.05)
+                    
+                    st.success(f"{step_name} - Concluído!")
+                    time.sleep(0.3)
+            
+            multi_container.success("🚀 Processo completo finalizado!")
     
     # Exemplo de gráfico interativo
     st.write("Exemplo de gráfico interativo:")
@@ -665,18 +747,54 @@ def render_opcao2():
         st.write(f"Você digitou: {sidebar_input}")
 
 def render_opcao3():
+    
+
+    
     st.title("Conteúdo da Opção 3")
     st.header("Advance Widgets Test")
     st.write("Exemplo de widget avançado:")
 
     st.button(label="Clique aqui",key="botao_avancado")
-    st.checkbox(label="Marque esta caixa", key="checkbox_avancado")
-    if "slider_avancado" not in st.session_state:
-        st.session_state.slider_avancado = 25
     
+    st.divider()
+    
+    # Toggle switch
+    st.write("Exemplo de toggle switch:")
+    
+    
+    if "checkbox_avancado" not in st.session_state:
+        st.session_state.checkbox_avancado = False
+        
+
+    st.checkbox(label="Marque esta caixa", key="checkbox_avancado", help="Este é um checkbox de exemplo.")
+
+    if st.session_state.checkbox_avancado:
+        st.success("Checkbox está marcado!")
+        user_input = st.text_input(label="Digite algo:", key="input_avancado", placeholder="Digite aqui...",value=st.session_state.get("input_avancado", ""))
+        st.write(f"Você digitou: {user_input}")
+    else:
+        # Não renderiza o campo, mas mantém o valor no session_state
+        user_input = st.session_state.get("input_avancado", "")
+        st.write(f"Você digitou: {user_input}")
+
+   # Slider do valor mínimo
+
     min_value = st.slider(label="Selecione o valor mínimo:", min_value=0, max_value=50, value=25, key="min_value_avancado")
-    st.session_state.slider_avancado = st.slider(label="Selecione um valor:", min_value=min_value, max_value=100, value=st.session_state.slider_avancado, key="slider_avancado")
-    st.write(f"Valor do slider: {st.session_state.slider_avancado}")
+
+    # Slider principal, sempre respeitando o mínimo
+    valor = st.slider(
+        label="Selecione um valor:",
+        min_value=0,
+        max_value=100,
+        value=max(min_value, st.session_state.get("min_value_avancado", min_value)),
+        key="slider_avancado"
+    )
+    if st.session_state.slider_avancado < min_value:
+        st.session_state.slider_avancado = min_value
+
+    st.write(f"Valor selecionado: {valor}")
+    
+    st.divider()
 
     st.selectbox(label="Selecione uma opção:", options=["Opção 1", "Opção 2", "Opção 3"], key="selectbox_avancado")
     
@@ -685,12 +803,517 @@ def render_opcao3():
     st.text_input(label="Digite algo:", value="Texto padrão", key="text_input_avancado")
     st.date_input(label="Selecione uma data:", key="date_input_avancado")
     st.time_input(label="Selecione uma hora:", key="time_input_avancado")
+    
+    
+    st.divider()
+    
+    # CACHING section
+    st.title("Exemplo de Caching")
+    @st.cache_data(ttl=60) #Cache por 60 segundos
+    def fetch_data():
+        time.sleep(2)  # Simula uma operação demorada
+        return {"data": "Dados carregados com cache!",
+                "timestamp": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}
+    
+    st.write("Clique no botão abaixo para carregar os dados com cache.")
+    if st.button(label="Carregar Dados com Cache", key="botao_cache"):
+        data = fetch_data()
+        print(type(data))
+        
+        
+        json_string = json.dumps(data)
+        st.write(json_string)
+        print(type(json_string))
+        
+        json_data = json.loads(json_string)
+        print(type(json_data))
+        st.write(json_data)
+        st.write(f"json_data: {json_data}") # print(json_data)
+
+        st.write(f"data: {data}") # print(data)
+        st.write(f"fetch_data()['data']: {fetch_data()['data']}") # print(fetch_data()['data'])
+        st.write(f"fetch_data()['timestamp']: {fetch_data()['timestamp']}") # print(fetch_data()['timestamp'])
+
+    st.divider()
+    
+    
+    # Caching Resource
+    file_path = "test.txt"
+    
+    st.title("Exemplo de Caching Resource")
+    @st.cache_resource
+    def get_file_handler():
+        file = open(os.path.join(os.path.dirname(__file__), "[CSG] Capa LI Colaboradores.png"), "rb")
+        return file
+    
+    file_handler = get_file_handler()
+    st.download_button(label="Baixar Capa", data=file_handler, file_name="[CSG] Capa LI Colaboradores.png", mime="image/png")
+    
+    # Escrever no arquivo
+    if st.button(label="Escrever no arquivo", key="botao_escrever_arquivo"):
+        with open(file_path, "a", encoding="utf-8") as file:
+            file.write("Texto para escrever no arquivo.\n")
+            file.write(f"Escrito em: {datetime.datetime.now()}\n")
+        st.success("Texto escrito no arquivo com sucesso!")
+
+    # Ler o arquivo
+    if st.button(label="Ler o arquivo", key="botao_ler_arquivo"):
+        try:
+            with open(file_path, "r", encoding="utf-8") as file:
+                content = file.read()
+            st.write(f"Conteudo do arquivo:\n{content}")
+        except Exception as e:
+            st.error(f"Erro ao ler o arquivo: {e}")
+
+    st.divider()
+
+    st.title("Counter exemplo com Imediate run")
+    if "counter_imediate" not in st.session_state:
+        st.session_state.counter_imediate = 0
+    def increment_and_rerun():
+        st.session_state.counter_imediate += 1
+        st.rerun()
+    st.write(f"Contador Imediate: {st.session_state.counter_imediate}")
+    st.button("Incrementar Contador Imediate", on_click=increment_and_rerun)
+        
 
 def render_opcao4():
     st.title("Conteúdo da Opção 4")
+    st.header("Este é um exemplo de fragmento.")
+    st.subheader("Fragmentos ajudam a organizar o código.")
+    st.write("Eles podem ser reutilizados em diferentes partes do aplicativo.")
+    
+    @st.fragment()
+    def fragment_example():
+        
+        cols = st.columns(2)
+        cols[0].toggle(label="Toggle", key="toggle_fragment_col1", label_visibility="visible")
+        cols[0].toggle(label="Toggle 2", key="toggle_fragment_col1_2", label_visibility="visible")
+        cols[0].toggle(label="Toggle 3", key="toggle_fragment_col1_3", label_visibility="visible")
+        cols[1].text_area(label="Text Area", placeholder="Texto padrão", key="text_area_fragment_col2", label_visibility="visible")
+        st.file_uploader(label="File Uploader", key="file_uploader_fragment", label_visibility="visible")
+        
+    @st.fragment()
+    def another_fragment():
+        num_colunas = 2
+        colunas = st.columns(num_colunas)
+        for i, coluna in enumerate(colunas):
+            with coluna:
+                st.subheader(f"Conteúdo da Coluna {i+1} dentro do fragmento.")
+                st.button(label=f"Botão na Coluna {i+1}")
 
+    @st.fragment()
+    def progress_bar_fragment():
+        st.write("### Progress Bar com Fragment")
+        
+        # Botão para iniciar o progress bar fragmentado
+        if st.button("🎯 Iniciar Progress Fragment", key="start_progress_fragment"):
+            progress_placeholder = st.empty()
+            status_placeholder = st.empty()
+            
+            # Criar progress bar dentro do fragment
+            with progress_placeholder.container():
+                progress_bar = st.progress(0)
+                
+                for i in range(100):
+                    progress_bar.progress(i + 1)
+                    status_placeholder.info(f"Fragment Progress: {i + 1}/100")
+                    time.sleep(0.03)  # Mais rápido para melhor UX
+                    
+            status_placeholder.success("🎉 Fragment Progress concluído!")
+            time.sleep(1)
+            progress_placeholder.empty()  # Limpar após conclusão
+    
+    st.divider()
+    
+    progress_bar_fragment()
+    fragment_example()
+    cols = st.columns(2)
+    st.selectbox(label="Select", options=["Opção 1", "Opção 2", "Opção 3"], key="selectbox_out_fragment_col1", label_visibility="visible")
+    st.button(label="Update", key="button_out_fragment_col2", width='stretch')
+    st.divider()  
+    another_fragment()
+    
+    
 def render_opcao5():
     st.title("Conteúdo da Opção 5")
+    st.header("Este é um exemplo multi-página.")
+    
+    # Exemplo de multipáginas usando session state (método simples)
+    st.subheader("🔧 Método 1: Multipáginas com Session State")
+    
+    # Inicializar estado da página
+    if 'current_page' not in st.session_state:
+        st.session_state.current_page = 'Home'
+    
+    # Menu de navegação
+    st.write("**Menu de Navegação:**")
+    col1, col2, col3, col4, col5 = st.columns(5)
+    
+    with col1:
+        if st.button("🏠 Home", key="nav_home"):
+            st.session_state.current_page = 'Home'
+    with col2:
+        if st.button("👤 Perfil", key="nav_profile"):
+            st.session_state.current_page = 'Perfil'
+    with col3:
+        if st.button("📊 Dashboard", key="nav_dashboard"):
+            st.session_state.current_page = 'Dashboard'
+    with col4:
+        if st.button("⚙️ Configurações", key="nav_settings"):
+            st.session_state.current_page = 'Configurações'
+    with col5:
+        if st.button("ℹ️ Sobre", key="nav_about"):
+            st.session_state.current_page = 'Sobre'
+    
+    st.divider()
+    
+    # Renderizar página atual
+    render_current_page()
+    
+    st.divider()
+    
+    # Exemplo de navegação com selectbox
+    st.subheader("🎯 Método 2: Navegação com Selectbox")
+    
+    page_options = ["Home", "Perfil", "Dashboard", "Configurações", "Sobre"]
+    selected_page = st.selectbox(
+        "Selecione uma página:",
+        page_options,
+        index=page_options.index(st.session_state.current_page),
+        key="page_selector"
+    )
+    
+    if selected_page != st.session_state.current_page:
+        st.session_state.current_page = selected_page
+        st.rerun()
+    
+    st.divider()
+    
+    # Informações sobre st.navigation para arquivos separados
+    st.subheader("📁 Método 3: st.navigation (Arquivos Separados)")
+    st.info("""
+    Para usar `st.navigation()` com arquivos separados, você precisa:
+    1. Criar arquivos Python separados (ex: page1.py, page2.py)
+    2. Cada arquivo deve conter o conteúdo da página
+    3. Usar st.navigation() para navegar entre eles
+    
+    Exemplo de estrutura:
+    ```
+    projeto/
+    ├── main.py (arquivo principal)
+    ├── pages/
+    │   ├── page1.py
+    │   ├── page2.py
+    │   └── page3.py
+    ```
+    """)
+    
+    if st.button("🚀 Criar Exemplo de Multipáginas Separadas", key="create_multipage"):
+        create_multipage_example()
+
+def render_current_page():
+    """Renderiza a página atual baseada no session state"""
+    
+    current_page = st.session_state.current_page
+    
+    if current_page == 'Home':
+        render_home_page()
+    elif current_page == 'Perfil':
+        render_profile_page()
+    elif current_page == 'Dashboard':
+        render_dashboard_page()
+    elif current_page == 'Configurações':
+        render_settings_page()
+    elif current_page == 'Sobre':
+        render_about_page()
+
+def render_home_page():
+    """Página Home"""
+    st.markdown("## 🏠 Página Home")
+    st.write("Bem-vindo à página inicial!")
+    
+    col1, col2 = st.columns(2)
+    with col1:
+        st.metric("Usuários Ativos", "1,234", "+12%")
+        st.metric("Vendas Hoje", "R$ 56.789", "+5%")
+    with col2:
+        st.metric("Novos Clientes", "89", "+23%")
+        st.metric("Taxa de Conversão", "3.4%", "-0.2%")
+    
+    # Gráfico simples
+    chart_data = pd.DataFrame(
+        np.random.randn(20, 3),
+        columns=['Vendas', 'Marketing', 'Suporte']
+    )
+    st.line_chart(chart_data)
+
+def render_profile_page():
+    """Página Perfil"""
+    st.markdown("## 👤 Página Perfil")
+    st.write("Gerencie suas informações pessoais")
+    
+    with st.form("profile_form"):
+        col1, col2 = st.columns(2)
+        
+        with col1:
+            nome = st.text_input("Nome Completo", value="João Silva")
+            email = st.text_input("Email", value="joao@exemplo.com")
+            telefone = st.text_input("Telefone", value="(11) 99999-9999")
+        
+        with col2:
+            departamento = st.selectbox("Departamento", ["TI", "Vendas", "Marketing", "RH"])
+            cargo = st.text_input("Cargo", value="Desenvolvedor")
+            data_admissao = st.date_input("Data de Admissão")
+        
+        if st.form_submit_button("💾 Salvar Alterações"):
+            st.success("Perfil atualizado com sucesso!")
+            st.balloons()
+
+def render_dashboard_page():
+    """Página Dashboard"""
+    st.markdown("## 📊 Dashboard")
+    st.write("Visualize métricas e relatórios importantes")
+    
+    # Métricas principais
+    col1, col2, col3, col4 = st.columns(4)
+    with col1:
+        st.metric("Receita Total", "R$ 1.2M", "+15%")
+    with col2:
+        st.metric("Clientes", "2.5K", "+8%")
+    with col3:
+        st.metric("Produtos Vendidos", "15.3K", "+12%")
+    with col4:
+        st.metric("Taxa de Retenção", "94%", "+2%")
+    
+    # Gráficos
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        st.subheader("Vendas por Mês")
+        sales_data = pd.DataFrame({
+            'Mês': ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun'],
+            'Vendas': [100, 120, 140, 110, 160, 180]
+        })
+        st.bar_chart(sales_data.set_index('Mês'))
+    
+    with col2:
+        st.subheader("Distribuição por Categoria")
+        category_data = pd.DataFrame({
+            'Categoria': ['Eletrônicos', 'Roupas', 'Casa', 'Esportes'],
+            'Vendas': [30, 25, 20, 25]
+        })
+        st.bar_chart(category_data.set_index('Categoria'))
+
+def render_settings_page():
+    """Página Configurações"""
+    st.markdown("## ⚙️ Configurações")
+    st.write("Configure suas preferências do sistema")
+    
+    # Configurações gerais
+    st.subheader("Configurações Gerais")
+    
+    col1, col2 = st.columns(2)
+    with col1:
+        theme = st.selectbox("Tema", ["Claro", "Escuro", "Auto"])
+        language = st.selectbox("Idioma", ["Português", "English", "Español"])
+        notifications = st.checkbox("Receber notificações", value=True)
+    
+    with col2:
+        auto_save = st.checkbox("Salvamento automático", value=True)
+        show_tooltips = st.checkbox("Mostrar dicas", value=True)
+        compact_mode = st.checkbox("Modo compacto", value=False)
+    
+    # Configurações de segurança
+    st.subheader("Segurança")
+    
+    with st.expander("Alterar Senha"):
+        current_password = st.text_input("Senha Atual", type="password")
+        new_password = st.text_input("Nova Senha", type="password")
+        confirm_password = st.text_input("Confirmar Nova Senha", type="password")
+        
+        if st.button("Alterar Senha"):
+            if new_password == confirm_password:
+                st.success("Senha alterada com sucesso!")
+            else:
+                st.error("As senhas não coincidem!")
+    
+    # Botão salvar
+    if st.button("💾 Salvar Configurações", key="save_settings"):
+        st.success("Configurações salvas com sucesso!")
+
+def render_about_page():
+    """Página Sobre"""
+    st.markdown("## ℹ️ Sobre")
+    st.write("Informações sobre o sistema")
+    
+    st.markdown("""
+    ### 🚀 Sistema de Gestão v2.0
+    
+    Este é um sistema completo de gestão desenvolvido com Streamlit.
+    
+    **Recursos principais:**
+    - Dashboard interativo
+    - Gerenciamento de perfil
+    - Configurações personalizáveis
+    - Múltiplas páginas
+    - Interface responsiva
+    
+    **Tecnologias utilizadas:**
+    - Python 3.9+
+    - Streamlit
+    - Pandas
+    - NumPy
+    - Matplotlib
+    
+    **Versão:** 2.0.1
+    **Desenvolvido por:** Equipe de Desenvolvimento
+    **Última atualização:** Setembro 2025
+    """)
+    
+    st.divider()
+    
+    # Informações do sistema
+    st.subheader("Informações do Sistema")
+    
+    col1, col2 = st.columns(2)
+    with col1:
+        st.info("**Status:** ✅ Online")
+        st.info("**Uptime:** 99.9%")
+        st.info("**Usuários Ativos:** 1,234")
+    
+    with col2:
+        st.info("**Última Manutenção:** 20/09/2025")
+        st.info("**Próxima Atualização:** 30/09/2025")
+        st.info("**Suporte:** suporte@empresa.com")
+
+def create_multipage_example():
+    """Cria arquivos de exemplo para multipáginas separadas"""
+    try:
+        # Criar diretório pages se não existir
+        pages_dir = os.path.join(os.path.dirname(__file__), "pages")
+        os.makedirs(pages_dir, exist_ok=True)
+        
+        # Conteúdo dos arquivos de exemplo
+        page_contents = {
+            "home.py": '''
+import streamlit as st
+import pandas as pd
+import numpy as np
+
+st.title("🏠 Home")
+st.write("Esta é a página inicial do sistema multipáginas!")
+
+# Métricas
+col1, col2, col3 = st.columns(3)
+with col1:
+    st.metric("Usuários", "1,234", "+12%")
+with col2:
+    st.metric("Vendas", "R$ 56.789", "+5%")
+with col3:
+    st.metric("Conversão", "3.4%", "-0.2%")
+
+# Gráfico
+chart_data = pd.DataFrame(
+    np.random.randn(20, 3),
+    columns=['A', 'B', 'C']
+)
+st.line_chart(chart_data)
+''',
+            "analytics.py": '''
+import streamlit as st
+import pandas as pd
+import numpy as np
+
+st.title("📊 Analytics")
+st.write("Dashboard de análise de dados")
+
+# Gráficos lado a lado
+col1, col2 = st.columns(2)
+
+with col1:
+    st.subheader("Vendas por Categoria")
+    data = pd.DataFrame({
+        'Categoria': ['A', 'B', 'C', 'D'],
+        'Vendas': [100, 80, 120, 90]
+    })
+    st.bar_chart(data.set_index('Categoria'))
+
+with col2:
+    st.subheader("Crescimento Mensal")
+    growth_data = pd.DataFrame(
+        np.random.randn(12, 1).cumsum(),
+        columns=['Crescimento']
+    )
+    st.line_chart(growth_data)
+''',
+            "settings.py": '''
+import streamlit as st
+
+st.title("⚙️ Configurações")
+st.write("Configure suas preferências")
+
+# Configurações
+with st.form("settings_form"):
+    theme = st.selectbox("Tema", ["Claro", "Escuro"])
+    notifications = st.checkbox("Notificações")
+    auto_save = st.checkbox("Salvamento Automático")
+    
+    if st.form_submit_button("Salvar"):
+        st.success("Configurações salvas!")
+        st.balloons()
+'''
+        }
+        
+        # Criar arquivos
+        for filename, content in page_contents.items():
+            file_path = os.path.join(pages_dir, filename)
+            with open(file_path, 'w', encoding='utf-8') as f:
+                f.write(content.strip())
+        
+        # Criar arquivo principal de navegação
+        main_content = '''
+import streamlit as st
+
+# Configurar página
+st.set_page_config(
+    page_title="Sistema Multipáginas",
+    page_icon="🚀",
+    layout="wide"
+)
+
+# Criar páginas
+home_page = st.Page("pages/home.py", title="Home", icon="🏠")
+analytics_page = st.Page("pages/analytics.py", title="Analytics", icon="📊")
+settings_page = st.Page("pages/settings.py", title="Configurações", icon="⚙️")
+
+# Navegação
+pg = st.navigation([home_page, analytics_page, settings_page])
+
+# Executar página selecionada
+pg.run()
+'''
+        
+        main_file_path = os.path.join(os.path.dirname(__file__), "multipage_main.py")
+        with open(main_file_path, 'w', encoding='utf-8') as f:
+            f.write(main_content.strip())
+        
+        st.success("✅ Arquivos de exemplo criados com sucesso!")
+        st.info(f"""
+        Arquivos criados:
+        - `multipage_main.py` (arquivo principal)
+        - `pages/home.py`
+        - `pages/analytics.py`
+        - `pages/settings.py`
+        
+        Para executar o exemplo:
+        ```bash
+        streamlit run multipage_main.py
+        ```
+        """)
+        
+    except Exception as e:
+        st.error(f"Erro ao criar arquivos: {str(e)}")
 
 # Mapeamento dinâmico
 render_map = {
